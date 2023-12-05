@@ -1,6 +1,7 @@
 import React from 'react';
+import { useNavigation,useFocusEffect } from "@react-navigation/native";
 import {ScrollView, StyleSheet,  Text, View, Image, TouchableOpacity,} from 'react-native';
-import {ChartCircle,Notification, Setting} from 'iconsax-react-native';
+import {SearchNormal1,ChartCircle,Notification, Setting} from 'iconsax-react-native';
 import { fontType } from '../../theme';
 import {SearchBar,Category,Promo} from '../../../components';
 const Home = () => {
@@ -21,7 +22,12 @@ const Home = () => {
             </View>
           </TouchableOpacity>
         </View>
-        <SearchBar/>
+        <TouchableOpacity onPress={() => navigation.navigate("Search")}>
+          <View style={{borderRadius: 20,alignItems: 'center',flexDirection:'row', gap: 20, padding: 20, backgroundColor: '#FFFFFF', marginHorizontal: 10, marginBottom: 20}}>
+              <SearchNormal1 size="26" color="#000000"/>
+              <Text style={{fontFamily: fontType['NS-Medium']}}>Search..</Text>
+          </View>
+        </TouchableOpacity>
         <Category/>
         <View style={{flexDirection:'row', marginHorizontal: 14, marginVertical: 12, gap: 50, justifyContent: 'center'}}>
             <Text style={styles.text}>Upcoming Appointments</Text>

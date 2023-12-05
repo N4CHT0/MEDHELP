@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {  Home2, Avalanche, Profile2User, ShoppingCart, Category2 } from 'iconsax-react-native';
 import React from 'react'
-import { Home,Profile,Services } from '../pages';
+import { Home,Profile,Services,AddItem,Search } from '../pages';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const MainApp = () => {
@@ -49,6 +49,8 @@ const Router = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="MainApp" component={MainApp} options={{ headerShown: false }} />
+      <Stack.Screen name="Search" component={Search} options={{ headerShown: false }} />
+      <Stack.Screen name="AddItem" component={AddItem} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }

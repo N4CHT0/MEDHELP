@@ -1,6 +1,6 @@
 import { Image,Animated, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, {useRef} from 'react'
-import {Call, ChartCircle,Hospital,Notification, People, Setting} from 'iconsax-react-native';
+import {Call, Category2, ChartCircle,Hospital,Notification, People, SearchNormal1, Setting} from 'iconsax-react-native';
 import { fontType } from '../../theme';
 import { SLIDER } from '../../assets';
 import { useNavigation,useFocusEffect } from "@react-navigation/native";
@@ -36,6 +36,12 @@ const Services = () => {
               </View>
             </TouchableOpacity>
         </Animated.View>
+        <TouchableOpacity onPress={() => navigation.navigate("Search")}>
+          <View style={{borderRadius: 20,alignItems: 'center',flexDirection:'row', gap: 20, padding: 20, backgroundColor: '#FFFFFF', marginHorizontal: 10, marginBottom: 20}}>
+              <SearchNormal1 size="26" color="#000000"/>
+              <Text style={{fontFamily: fontType['NS-Medium']}}>Search..</Text>
+          </View>
+        </TouchableOpacity>
         <View style={{flexDirection: 'row',marginHorizontal: 20,gap: 20}}>
           <TouchableOpacity>
             <ImageBackground source={SLIDER} style={{padding: 30,alignItems: 'center', gap: 10}} imageStyle={{borderRadius: 20,}}>
@@ -112,6 +118,9 @@ const Services = () => {
         </View>
           </View>
       </Animated.ScrollView>
+      <TouchableOpacity style={{padding: 20, position:'absolute', top: 630,right: 20, backgroundColor:'#1F91FC',borderRadius: 20}} onPress={() => navigation.navigate("AddItem")}>
+        <Category2 size="29"  color="#F7F7F7" variant='Bold'/>
+    </TouchableOpacity>
     </View>
   )
 }
