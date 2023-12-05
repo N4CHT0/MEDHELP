@@ -1,9 +1,9 @@
 import React from 'react';
 import {ScrollView, StyleSheet,  Text, View, Image, TouchableOpacity,} from 'react-native';
 import {ChartCircle,Notification, Setting} from 'iconsax-react-native';
-import { fontType } from './src/theme';
-import {SearchBar,Category,Promo} from './components';
-const App = () => {
+import { fontType } from '../../theme';
+import {SearchBar,Category,Promo} from '../../../components';
+const Home = () => {
   return (
     <ScrollView>
       <View style={styles.page}>
@@ -34,7 +34,7 @@ const App = () => {
     </ScrollView>
   )
 }
-export default App
+export default Home
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
