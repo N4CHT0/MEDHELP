@@ -1,10 +1,11 @@
-import { Image,Animated, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, {useRef} from 'react'
+import { Image,Animated, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View,ActivityIndicator } from 'react-native'
+import {useNavigation,useFocusEffect} from '@react-navigation/native';
+import React, {useRef,useState,useCallback} from 'react';
+import axios from 'axios';
 import {Call, Category2, ChartCircle,Hospital,Notification, People, SearchNormal1, Setting} from 'iconsax-react-native';
 import { fontType } from '../../theme';
 import { SLIDER } from '../../assets';
-import { useNavigation,useFocusEffect } from "@react-navigation/native";
-import FastImage from 'react-native-fast-image'
+import { Item } from '../../../components';
 const Services = () => {
   const navigation = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -14,6 +15,33 @@ const Services = () => {
       outputRange: [0, -142],
       extrapolate: 'clamp',
     });
+    const [loading, setLoading] = useState(true);
+    const [productData, setProductData] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+    const getDataProduct = async () => {
+      try {
+        const response = await axios.get(
+          'https://6570c75b09586eff6641efc2.mockapi.io/medhelp/product',
+        );
+        setProductData(response.data);
+        setLoading(false)
+      } catch (error) {
+          console.error(error);
+      }
+    };
+    const onRefresh = useCallback(() => {
+      setRefreshing(true);
+      setTimeout(() => {
+        getDataProduct()
+        setRefreshing(false);
+      }, 1500);
+    }, []);
+  
+    useFocusEffect(
+      useCallback(() => {
+        getDataProduct();
+      }, [])
+    );
   return (
     <View style={{flex: 1}}>
       <Animated.ScrollView
@@ -61,60 +89,11 @@ const Services = () => {
             <Text style={{fontFamily: fontType['NS-Bold'], fontSize: 18,}}>Boost Your Immunity</Text>
           </View>
           <View style={{gap: 20}}>
-            <TouchableOpacity>
-              <View style={{flexDirection: 'row', gap: 20,}}>
-                <FastImage style={{width: 100,height: 100}} source={{uri : 'https://s3-v2-klikdokter-marketplace.s3.ap-southeast-1.amazonaws.com/m0cha-uuxahp2xiP/uploads/product/17928/17928_1637116854.2746.jpg'}}/>
-                <View style={{flexWrap: 'wrap', flexDirection: 'column'}}>
-                  <Text style={{fontFamily: fontType['NS-Light']}}>Imboost Vitamin C Tube 8 Tablet</Text>
-                  <Text style={{fontFamily: fontType['NS-SemiBold']}}>Rp.42.000.00</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <View style={{flexDirection: 'row', gap: 20,}}>
-                <FastImage style={{width: 100,height: 100}} source={{uri : 'https://s3-v2-klikdokter-marketplace.s3.ap-southeast-1.amazonaws.com/m0cha-uuxahp2xiP/uploads/product/17928/17928_1637116854.2746.jpg'}}/>
-                <View style={{flexWrap: 'wrap', flexDirection: 'column'}}>
-                  <Text style={{fontFamily: fontType['NS-Light']}}>Imboost Vitamin C Tube 8 Tablet</Text>
-                  <Text style={{fontFamily: fontType['NS-SemiBold']}}>Rp.42.000.00</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <View style={{flexDirection: 'row', gap: 20,}}>
-                <FastImage style={{width: 100,height: 100}} source={{uri : 'https://s3-v2-klikdokter-marketplace.s3.ap-southeast-1.amazonaws.com/m0cha-uuxahp2xiP/uploads/product/17928/17928_1637116854.2746.jpg'}}/>
-                <View style={{flexWrap: 'wrap', flexDirection: 'column'}}>
-                  <Text style={{fontFamily: fontType['NS-Light']}}>Imboost Vitamin C Tube 8 Tablet</Text>
-                  <Text style={{fontFamily: fontType['NS-SemiBold']}}>Rp.42.000.00</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <View style={{flexDirection: 'row', gap: 20,}}>
-                <FastImage style={{width: 100,height: 100}} source={{uri : 'https://s3-v2-klikdokter-marketplace.s3.ap-southeast-1.amazonaws.com/m0cha-uuxahp2xiP/uploads/product/17928/17928_1637116854.2746.jpg'}}/>
-                <View style={{flexWrap: 'wrap', flexDirection: 'column'}}>
-                  <Text style={{fontFamily: fontType['NS-Light']}}>Imboost Vitamin C Tube 8 Tablet</Text>
-                  <Text style={{fontFamily: fontType['NS-SemiBold']}}>Rp.42.000.00</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <View style={{flexDirection: 'row', gap: 20,}}>
-                <FastImage style={{width: 100,height: 100}} source={{uri : 'https://s3-v2-klikdokter-marketplace.s3.ap-southeast-1.amazonaws.com/m0cha-uuxahp2xiP/uploads/product/17928/17928_1637116854.2746.jpg'}}/>
-                <View style={{flexWrap: 'wrap', flexDirection: 'column'}}>
-                  <Text style={{fontFamily: fontType['NS-Light']}}>Imboost Vitamin C Tube 8 Tablet</Text>
-                  <Text style={{fontFamily: fontType['NS-SemiBold']}}>Rp.42.000.00</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <View style={{flexDirection: 'row', gap: 20,}}>
-                <FastImage style={{width: 100,height: 100}} source={{uri : 'https://s3-v2-klikdokter-marketplace.s3.ap-southeast-1.amazonaws.com/m0cha-uuxahp2xiP/uploads/product/17928/17928_1637116854.2746.jpg'}}/>
-                <View style={{flexWrap: 'wrap', flexDirection: 'column'}}>
-                  <Text style={{fontFamily: fontType['NS-Light']}}>Imboost Vitamin C Tube 8 Tablet</Text>
-                  <Text style={{fontFamily: fontType['NS-SemiBold']}}>Rp.42.000.00</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
+          {loading ? (
+                <ActivityIndicator size={'large'} color={'black'}/>
+              ) : (
+                productData.map((item, index) => <Item item={item} key={index}/>)
+              )}
         </View>
           </View>
       </Animated.ScrollView>

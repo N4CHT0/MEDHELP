@@ -1,4 +1,5 @@
 import Category from './Category'
 import SearchBar from './searchBar'
 import Promo from './Promo'
-export {Category,SearchBar,Promo}
+import Item from './Item'
+export {Category,SearchBar,Promo,Item}

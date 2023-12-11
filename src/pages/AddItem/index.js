@@ -10,23 +10,50 @@ import {
     ScrollView,
     TouchableWithoutFeedback
 } from "react-native";
+import axios from 'axios';
 import {fontType} from '../../theme';
 const AddItem = () => {
-    const [itemData, setItemData] = useState({
-        title: "",
-        description: "",
-        usage: "",
-        totalLikes: 0,
-        totalComments: 0,
-    });
-    const handleChange = (key, value) => {
-        setItemData({
-        ...itemData,
-        [key]: value,
+    const [loading, setLoading] = useState(false);
+        const [itemData, setitemData] = useState({
+            title: "",
+            description: "",
+            price: "",
+            createdAt: '',
+            totalLikes: 0,
+            totalComments: 0,
         });
-    };
-    const [image, setImage] = useState(null);
-    const navigation = useNavigation();
+        const handleUpload = async () => {
+            setLoading(true);
+            try {
+              await axios.post('https://6570c75b09586eff6641efc2.mockapi.io/medhelp/product', {
+                  title: itemData.title,
+                  description: itemData.description,
+                  price: itemData.price,
+                  image,
+                  totalComments: itemData.totalComments,
+                  totalLikes: itemData.totalLikes,
+                  createdAt: new Date(),
+                })
+                .then(function (response) {
+                  console.log(response);
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+              setLoading(false);
+              navigation.navigate('Services');
+            } catch (e) {
+              console.log(e);
+            }
+          };
+        const handleChange = (key, value) => {
+            setitemData({
+            ...itemData,
+            [key]: value,
+            });
+        };
+        const [image, setImage] = useState(null);
+        const navigation = useNavigation();
     return (
             <View style={{flex: 1}}>
                 <View style={styles.header}>
@@ -57,7 +84,7 @@ const AddItem = () => {
                 <View style={textInput.board}>
                     <TextInput
                     placeholder="Keterangan Obat."
-                    value={itemData.title}
+                    value={itemData.description}
                     onChangeText={(text) => handleChange("description", text)}
                     placeholderTextColor={'gray'}
                     multiline
@@ -66,9 +93,9 @@ const AddItem = () => {
                 </View>
                 <View style={textInput.board}>
                     <TextInput
-                    placeholder="Pemakaian."
-                    value={itemData.title}
-                    onChangeText={(text) => handleChange("usage", text)}
+                    placeholder="Harga."
+                    value={itemData.price}
+                    onChangeText={(text) => handleChange("price", text)}
                     placeholderTextColor={'gray'}
                     multiline
                     style={textInput.title}
@@ -77,15 +104,15 @@ const AddItem = () => {
                 <View style={textInput.board}>
                     <TextInput
                     placeholder="URL."
-                    value={itemData.title}
-                    onChangeText={(text) => handleChange("image", text)}
+                    value={itemData.image}
+                    onChangeText={(text) => setImage(text)}
                     placeholderTextColor={'gray'}
                     multiline
                     style={textInput.title}
                     />
                 </View>
             </ScrollView>
-            <TouchableOpacity style={{backgroundColor: '#3693F4',padding: 15, flexDirection: 'row',alignItems: 'center', gap: 12, marginHorizontal: 120, borderRadius: 14, position: 'absolute', top: 670,left:192}}>
+            <TouchableOpacity onPress={handleUpload} style={{backgroundColor: '#3693F4',padding: 15, flexDirection: 'row',alignItems: 'center', gap: 12, marginHorizontal: 120, borderRadius: 14, position: 'absolute', top: 670,left:192}}>
                 <AddCircle variant="Linear" color="white" size={'30'}/>
             </TouchableOpacity>
         </View>
