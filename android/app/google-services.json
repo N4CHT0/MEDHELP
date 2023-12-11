@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1096740491766",
+    "project_id": "medhelp-c0997",
+    "storage_bucket": "medhelp-c0997.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096740491766:android:8552905df4a2b3a1d9f7d7",
+        "android_client_info": {
+          "package_name": "com.medhelp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSnUw0ELszZW4sEgkjS3m7P6UybGAdxng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

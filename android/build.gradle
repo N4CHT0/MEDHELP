@@ -12,10 +12,15 @@ buildscript {
     }
     repositories {
         google()
+        // ADD THIS
+        maven { url 'https://maven.google.com' }
+        // ADD THIS
+        maven { url "https://www.jitpack.io" }
         mavenCentral()
     }
     dependencies {
         classpath("com.android.tools.build:gradle")
+        classpath 'com.google.gms:google-services:4.4.0'
         classpath("com.facebook.react:react-native-gradle-plugin")
     }
 }

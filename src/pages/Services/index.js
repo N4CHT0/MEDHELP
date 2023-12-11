@@ -1,11 +1,11 @@
-import { Image,Animated, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View,ActivityIndicator } from 'react-native'
+import { Image,Animated, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View,ActivityIndicator,RefreshControl } from 'react-native'
 import {useNavigation,useFocusEffect} from '@react-navigation/native';
-import React, {useRef,useState,useCallback} from 'react';
-import axios from 'axios';
+import React, {useRef,useState,useCallback,useEffect} from 'react';
 import {Call, Category2, ChartCircle,Hospital,Notification, People, SearchNormal1, Setting} from 'iconsax-react-native';
 import { fontType } from '../../theme';
 import { SLIDER } from '../../assets';
 import { Item } from '../../../components';
+import firestore from '@react-native-firebase/firestore';
 const Services = () => {
   const navigation = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -18,30 +18,40 @@ const Services = () => {
     const [loading, setLoading] = useState(true);
     const [productData, setProductData] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
-    const getDataProduct = async () => {
-      try {
-        const response = await axios.get(
-          'https://6570c75b09586eff6641efc2.mockapi.io/medhelp/product',
-        );
-        setProductData(response.data);
-        setLoading(false)
-      } catch (error) {
-          console.error(error);
-      }
-    };
+    useEffect(() => {
+      const subscriber = firestore()
+        .collection('item')
+        .onSnapshot(querySnapshot => {
+          const item = [];
+          querySnapshot.forEach(documentSnapshot => {
+            item.push({
+              ...documentSnapshot.data(),
+              id: documentSnapshot.id,
+            });
+          });
+          setProductData(item);
+          setLoading(false);
+        });
+      return () => subscriber();
+    }, []);
     const onRefresh = useCallback(() => {
       setRefreshing(true);
       setTimeout(() => {
-        getDataProduct()
+        firestore()
+          .collection('item')
+          .onSnapshot(querySnapshot => {
+            const item = [];
+            querySnapshot.forEach(documentSnapshot => {
+              item.push({
+                ...documentSnapshot.data(),
+                id: documentSnapshot.id,
+              });
+            });
+            setProductData(productData);
+          });
         setRefreshing(false);
       }, 1500);
     }, []);
-  
-    useFocusEffect(
-      useCallback(() => {
-        getDataProduct();
-      }, [])
-    );
   return (
     <View style={{flex: 1}}>
       <Animated.ScrollView
@@ -49,7 +59,10 @@ const Services = () => {
         [{nativeEvent: {contentOffset: {y: scrollY}}}],
         {useNativeDriver: true},
       )}
-      contentContainerStyle={{paddingTop: 0}}>
+      contentContainerStyle={{paddingTop: 0}}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
         <Animated.View style={[styles.header, {transform: [{translateY: recentY}]}]}>
             <ChartCircle size="36" color="#1F91FC"/>
             <Text style={styles.headerTitle}>MEDHELP.</Text>

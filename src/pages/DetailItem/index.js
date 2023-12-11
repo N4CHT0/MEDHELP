@@ -3,7 +3,7 @@ import {useNavigation} from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 import { StyleSheet, Text, View,Image, ScrollView, Animated,TouchableOpacity,ActivityIndicator,Modal  } from 'react-native'
 import React, {useState,useRef,useEffect} from 'react'
-import axios from 'axios';
+import firestore from '@react-native-firebase/firestore';
 import { fontType } from '../../theme';
 import {formatNumber} from '../../utils/formatNumber';
 import {formatDate} from '../../utils/formatDate';
@@ -27,36 +27,50 @@ const DetailItem = ({route}) => {
     };
 
     useEffect(() => {
-        getDataById();
+      const subscriber = firestore()
+        .collection('item')
+        .doc(productId)
+        .onSnapshot(documentSnapshot => {
+          const itemData = documentSnapshot.data();
+          if (itemData) {
+            console.log('Item data: ', itemData);
+            setSelectedData(itemData);
+          } else {
+            console.log(`Item with ID ${productId} not found.`);
+          }
+        });
+      setLoading(false);
+      return () => subscriber();
     }, [productId]);
 
-    const getDataById = async () => {
-        try {
-        const response = await axios.get(
-            `https://6570c75b09586eff6641efc2.mockapi.io/medhelp/product/${productId}`,
-        );
-        setSelectedData(response.data);
-        setLoading(false);
-        } catch (error) {
-        console.error(error);
+    const handleDelete = async () => {
+      setLoading(true);
+      try {
+        await firestore()
+          .collection('item')
+          .doc(productId)
+          .delete()
+          .then(() => {
+            console.log('Item deleted!');
+          });
+        if (selectedItem?.image) {
+          const imageRef = storage().refFromURL(selectedItem?.image);
+          await imageRef.delete();
         }
+        console.log('Item deleted!');
+        closeActionSheet();
+        setSelectedData(null);
+        setLoading(false)
+        navigation.navigate('Services');
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     const navigateEdit = () => {
         closeActionSheet()
         navigation.navigate('EditItem', {productId})
     }
-    const handleDelete = async () => {
-    await axios.delete(`https://6570c75b09586eff6641efc2.mockapi.io/medhelp/product/${productId}`)
-        .then(() => {
-            closeActionSheet()
-            navigation.navigate('Keranjang');
-        })
-        .catch((error) => {
-            console.error(error);
-        });
-    }
-
     const navigation = useNavigation();
     const scrollY = useRef(new Animated.Value(0)).current;
     const diffClampY = Animated.diffClamp(scrollY, 0, 52);

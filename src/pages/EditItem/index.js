@@ -10,11 +10,15 @@ import {
     TouchableWithoutFeedback,
     ActivityIndicator
 } from "react-native";
-import { Category, DirectboxSend, Image, Notification, SearchNormal1 } from 'iconsax-react-native'
-import axios from 'axios';
+import { Category, DirectboxSend, Image, Notification, SearchNormal1,Add,AddSquare } from 'iconsax-react-native'
+import storage from '@react-native-firebase/storage';
+import ImagePicker from 'react-native-image-crop-picker';
+import firestore from '@react-native-firebase/firestore';
+import { fontType } from "../../theme";
+import FastImage from "react-native-fast-image";
 const EditItem = ({route}) => {
   const {productId} = route.params;
-    const [itemData, setItemData] = useState({
+    const [productData, setProductData] = useState({
         title: '',
         description: '',
         duration: '',
@@ -22,57 +26,82 @@ const EditItem = ({route}) => {
         totalComments: 0,
       });
       const handleChange = (key, value) => {
-        setItemData({
-          ...itemData,
+        setProductData({
+          ...productData,
           [key]: value,
         });
       };
+      const [oldImage, setOldImage] = useState(null);
       const [image, setImage] = useState(null);
       const navigation = useNavigation();
       const [loading, setLoading] = useState(true);
       useEffect(() => {
-        getPostById();
+        const subscriber = firestore()
+          .collection('item')
+          .doc(productId)
+          .onSnapshot(documentSnapshot => {
+            const itemData = documentSnapshot.data();
+            if (itemData) {
+              console.log('Item data: ', itemData);
+              setProductData({
+                title: itemData.title,
+                description: itemData.description,
+                price: itemData.price,
+              });
+              setOldImage(itemData.image);
+              setImage(itemData.image);
+              setLoading(false);
+            } else {
+              console.log(`Item with ID ${productId} not found.`);
+            }
+          });
+        setLoading(false);
+        return () => subscriber();
       }, [productId]);
     
-      const getPostById = async () => {
-        try {
-          const response = await axios.get(
-            `https://6570c75b09586eff6641efc2.mockapi.io/medhelp/product/${productId}`,
-          );
-          setItemData({
-            title : response.data.title,
-            description : response.data.description,
-            price : response.data.price,
-            image : response.data.image,
+      const handleImagePick = async () => {
+        ImagePicker.openPicker({
+          width: 1920,
+          height: 1080,
+          cropping: true,
+        })
+          .then(image => {
+            console.log(image);
+            setImage(image.path);
           })
-        setImage(response.data.image)
-          setLoading(false);
-        } catch (error) {
-          console.error(error);
-        }
+          .catch(error => {
+            console.log(error);
+          });
       };
+    
       const handleUpdate = async () => {
         setLoading(true);
+        let filename = image.substring(image.lastIndexOf('/') + 1);
+        const extension = filename.split('.').pop();
+        const name = filename.split('.').slice(0, -1).join('.');
+        filename = name + Date.now() + '.' + extension;
+        const reference = storage().ref(`images/${filename}`);
         try {
-          await axios
-            .put(`https://6570c75b09586eff6641efc2.mockapi.io/medhelp/product/${productId}`, {
-              title: itemData.title,
-              image,
-              description: itemData.description,
-              price : itemData.duration,
-              totalComments: itemData.totalComments,
-              totalLikes: itemData.totalLikes,
-            })
-            .then(function (response) {
-              console.log(response);
-            })
-            .catch(function (error) {
-              console.log(error);
-            });
+          if (image !== oldImage && oldImage) {
+            const oldImageRef = storage().refFromURL(oldImage);
+            await oldImageRef.delete();
+          }
+          if (image !== oldImage) {
+            await reference.putFile(image);
+          }
+          const url =
+            image !== oldImage ? await reference.getDownloadURL() : oldImage;
+          await firestore().collection('item').doc(productId).update({
+            title: productData.title,
+            description: productData.description,
+            image: url,
+            price: productData.price,
+          });
           setLoading(false);
-          navigation.navigate('Exercises');
-        } catch (e) {
-          console.log(e);
+          console.log('Item Updated!');
+          navigation.navigate('Services', {productId});
+        } catch (error) {
+          console.log(error);
         }
       };
   return (
@@ -86,10 +115,62 @@ const EditItem = ({route}) => {
                     </TouchableWithoutFeedback>
                 </View>
             <ScrollView>
+            {image ? (
+          <View style={{position: 'relative'}}>
+            <FastImage
+              style={{width: '100%', height: 127, borderRadius: 5}}
+              source={{
+                uri: image,
+                headers: {Authorization: 'someAuthToken'},
+                priority: FastImage.priority.high,
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                top: -5,
+                right: -5,
+                backgroundColor: 'blue',
+                borderRadius: 25,
+              }}
+              onPress={() => setImage(null)}>
+              <Add
+                size={20}
+                variant="Linear"
+                color="white"
+                style={{transform: [{rotate: '45deg'}]}}
+              />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity onPress={handleImagePick}>
+            <View
+              style={[
+                textInput.borderDashed,
+                {
+                  gap: 10,
+                  paddingVertical: 30,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                },
+              ]}>
+              <AddSquare color="gray" variant="Linear" size={42} />
+              <Text
+                style={{
+                  fontFamily: fontType['NS-Medium'],
+                  fontSize: 12,
+                  color: "gray",
+                }}>
+                Upload Thumbnail
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
                 <View style={textInput.board}>
                     <TextInput
                     placeholder="Nama Latihan"
-                    value={itemData.title}
+                    value={productData.title}
                     onChangeText={(text) => handleChange("title", text)}
                     placeholderTextColor={'gray'}
                     multiline
@@ -99,7 +180,7 @@ const EditItem = ({route}) => {
                 <View style={textInput.boardDescription}>
                     <TextInput
                     placeholder="Deskripsi Barang"
-                    value={itemData.description}
+                    value={productData.description}
                     onChangeText={(text) => handleChange("description", text)}
                     placeholderTextColor={'gray'}
                     multiline
@@ -109,18 +190,8 @@ const EditItem = ({route}) => {
                 <View style={textInput.boardDescription}>
                     <TextInput
                     placeholder="Harga."
-                    value={itemData.price}
+                    value={productData.price}
                     onChangeText={(text) => handleChange("price", text)}
-                    placeholderTextColor={'gray'}
-                    multiline
-                    style={textInput.title}
-                    />
-                </View>
-                <View style={textInput.boardDescription}>
-                    <TextInput
-                    placeholder="URL."
-                    value={image}
-                    onChangeText={(text) => setImage(text)}
                     placeholderTextColor={'gray'}
                     multiline
                     style={textInput.title}
